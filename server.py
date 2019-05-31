@@ -7,10 +7,10 @@ import socket
 # Listando arquivos no diretório atual
 def listaDiretorio():
     localFiles = os.listdir(os.getcwd())
-    result = ""
+    files = ""
     for file in localFiles:
-        result += file + '\t'
-    return result
+        file += file + '\t'
+    return file
 
 def main():
     HOST = socket.gethostbyname(socket.gethostname())      # Endereco IP do Servidor
