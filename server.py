@@ -8,9 +8,9 @@ import socket
 def listaDiretorio():
     localFiles = os.listdir(os.getcwd())
     files = ""
-    for file in localFiles:
-        file += file + '\t'
-    return file
+    for files in localFiles:
+        files += files + '\t'
+    return files
 
 def main():
     HOST = socket.gethostbyname(socket.gethostname())      # Endereco IP do Servidor
