@@ -1,19 +1,23 @@
 #!/usr/bin/python3
+# -*- coding: utf-8 -*-
 import socket
 import sys
 
 def main():
-   HOST = sys.argv[1]      # Endereco IP do Servidor.
-   PORT = int(sys.argv[2]) # Porta que o Servidor esta.
-   tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-   dest = (HOST, PORT)
-   tcp.connect(dest)
-   msg = "list"
-   tcp.sendto(msg.encode(), ('192.168.0.110', 33000))
-   con, servidor = tcp.accept()
-   print(con, servidor)
+   HOST = sys.argv[1]                                          # Endereco IP do Servidor.
+   PORT = int(sys.argv[2])                                     # Porta que o Servidor esta.
+   MSG = str(sys.argv[3])                                      # Mensagem que o cliente envia
+   SOCKET = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # Socket SOCKET do cliente
+   SERVER = (HOST, PORT)                                       # Endereço e porta do servidor
+   SOCKET.connect(SERVER)                                      # Conexão estabelecida entre cliente/servidor
 
-   tcp.close()
+
+###  Conexão com o servidor ###
+   if(MSG) == 'list':
+      SOCKET.sendto(MSG.encode(), SERVER)
+      filesList = str(SOCKET.recv(4096), 'utf-8')
+      SOCKET.close()
+      print(filesList)
 
 if __name__ == '__main__':
    main()
