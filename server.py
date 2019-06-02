@@ -13,8 +13,14 @@ def listDirectory():
     return files
 
 
+def putFile():                                                          # Em produção...
+    pass
+
+def removeFile():                                                       # Em produção...
+    pass
+
 ### Download de arquivos ###
-def getFile(fileName):                                                  # Em produção....
+def getFile(fileName):                                                  # Em produção...
     f = open(os.getcwd() + '/{fileName}', 'rb')                        
     return f
 
@@ -30,10 +36,12 @@ def main():
         con, cliente = SOCKET.accept()                                  # Aceita a conexão do cliente
         print ('Conectado por', cliente)                                    
         while True:
-            msg = con.recv(1024)                                        # Recebe a mensagem do cliente em bytes
-            if not msg: break
-            elif msg == bytes('list', 'utf-8'):                         # Verifica se a mensagem é de listagem e decodifica
+            MSG = bytes(con.recv(1024), 'utf-8')                        # Recebe a mensagem do cliente em bytes
+            if not MSG: pass
+            elif MSG == 'list':                                         # Verifica se a mensagem é de listagem e decodifica
                 con.sendall(bytes(listDirectory(), 'utf-8'))            # Responde com a listagem do diretório
+            elif MSG.count('put', 0, 3):                                # Recebe o arquivo do cliente e salva no servidor
+                pass                                                    # Em andamento ...
         print ('Finalizando conexao do cliente', cliente)
         con.close()                                                     # Fecha a conexão
 

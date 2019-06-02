@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 import socket
+import os
 import sys
 
 def main():
@@ -18,6 +19,10 @@ def main():
       filesList = str(SOCKET.recv(4096), 'utf-8')              # Recebe a cadeia de bytes e a transforma em string
       SOCKET.close()
       print(filesList)                                         # Mostra a listagem do diretório
+   elif(MSG) == 'put':
+      HEADERSIZE = os.stat(os.getcwd() + '/{sys.argv[4]}').st_size
+      f = open(os.getcwd() + '/{sys.argv[4]}', 'rb')
+
 
 if __name__ == '__main__':
    main()
