@@ -31,6 +31,8 @@ def putFile(con, fileName):                                             # Em pro
     with open(fileName, 'wb') as f:
         f.write(packet)
 
+
+### Remoção de arquivos do servidor ###
 def removeFile():                                                       # Em produção...
     pass
 
@@ -51,13 +53,12 @@ def main():
         con, cliente = SOCKET.accept()                                  # Aceita a conexão do cliente
         print ('Conectado por', cliente)                                    
         while True:
-            MSG = str(con.recv(1024), 'utf-8')                        # Recebe a mensagem do cliente em bytes
+            MSG = str(con.recv(1024), 'utf-8')                          # Recebe a mensagem do cliente em bytes
             if not MSG: pass
             elif MSG == 'list':                                         # Verifica se a mensagem é de listagem e decodifica
                 con.sendall(bytes(listDirectory(), 'utf-8'))            # Responde com a listagem do diretório
-            elif MSG.count('put', 0, 3):                                # Recebe o arquivo do cliente e salva no servidor
-                new_str = MSG.replace('put', '')
-                putFile(con, new_str)                                                    # Em andamento ...
+            elif MSG == 'put':
+                pass                                # Recebe o arquivo do cliente e salva no servidor                                                   # Em andamento ...
         print ('Finalizando conexao do cliente', cliente)
         con.close()                                                     # Fecha a conexão
 
