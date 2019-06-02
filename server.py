@@ -12,9 +12,24 @@ def listDirectory():
         files += file + '\t'
     return files
 
+### Upload de arquivos para o servidor ###
+def putFile(con, fileName):                                             # Em produção...
+    expected_size = b""
+    while len(expected_size) < 8:
+        more_size = con.recv(8 - len(expected_size))
+        if not more_size:
+            raise Exception('msg invalida')
+        expected_size += more_size
+    expected_size = int.from_bytes(expected_size, 'big')
 
-def putFile():                                                          # Em produção...
-    pass
+    packet = b""
+    while len(packet) < expected_size:
+        buffer = con.recv(expected_size - len(packet))
+        if not buffer:
+            raise Exception('arquivo imcompleto')
+        packet += buffer
+    with open(fileName, 'wb') as f:
+        f.write(packet)
 
 def removeFile():                                                       # Em produção...
     pass
@@ -36,12 +51,13 @@ def main():
         con, cliente = SOCKET.accept()                                  # Aceita a conexão do cliente
         print ('Conectado por', cliente)                                    
         while True:
-            MSG = bytes(con.recv(1024), 'utf-8')                        # Recebe a mensagem do cliente em bytes
+            MSG = str(con.recv(1024), 'utf-8')                        # Recebe a mensagem do cliente em bytes
             if not MSG: pass
             elif MSG == 'list':                                         # Verifica se a mensagem é de listagem e decodifica
                 con.sendall(bytes(listDirectory(), 'utf-8'))            # Responde com a listagem do diretório
             elif MSG.count('put', 0, 3):                                # Recebe o arquivo do cliente e salva no servidor
-                pass                                                    # Em andamento ...
+                new_str = MSG.replace('put', '')
+                putFile(con, new_str)                                                    # Em andamento ...
         print ('Finalizando conexao do cliente', cliente)
         con.close()                                                     # Fecha a conexão
 

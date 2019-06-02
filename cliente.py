@@ -15,13 +15,18 @@ def main():
 
 ###  Conexão com o servidor ###
    if(MSG) == 'list':                                          # Lista os diretórios do servidor
-      SOCKET.sendto(MSG.encode(), SERVER)
+      SOCKET.sendto(bytes(MSG, 'utf-8'), SERVER)
       filesList = str(SOCKET.recv(4096), 'utf-8')              # Recebe a cadeia de bytes e a transforma em string
       SOCKET.close()
       print(filesList)                                         # Mostra a listagem do diretório
    elif(MSG) == 'put':
-      HEADERSIZE = os.stat(os.getcwd() + '/{sys.argv[4]}').st_size
-      f = open(os.getcwd() + '/{sys.argv[4]}', 'rb')
+      print('Enviando o arquivo: {sys.argv[4]}')
+      with open(os.getcwd() + '/{sys.argv[4]}', 'rb') as f:
+         file = f.read()
+      SOCKET.sendto(MSG.encode(), SERVER)
+      SOCKET.sendall(os.stat(os.getcwd() + '/{sys.argv[4]}').st_size) # Notifica ao servidor o tamanho do arquivo
+      SOCKET.sendfile(file)                                    # Envia o arquivo para o servidor
+
 
 
 if __name__ == '__main__':
