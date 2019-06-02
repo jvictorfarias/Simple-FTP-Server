@@ -13,7 +13,7 @@ def main():
 
 
 ###  Conexão com o servidor ###
-   if(MSG) == 'list':
+   if(MSG) == 'list':                                          # Lista os diretórios do servidor
       SOCKET.sendto(MSG.encode(), SERVER)
       filesList = str(SOCKET.recv(4096), 'utf-8')
       SOCKET.close()
