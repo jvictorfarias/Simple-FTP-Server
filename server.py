@@ -1,10 +1,11 @@
-#! /usr/bin/python3
+#! /usr/bin/python
 # -*- coding: utf-8 -*-
 import sys
 import os
-import socket
+from socket import socket, AF_INET, SOCK_STREAM, gethostbyname, gethostname
 
-### Listando arquivos no diretório atual ###
+HEADER = 20
+# Listando arquivos no diretório atual ###
 def listDirectory():
     localFiles = os.listdir(os.getcwd())                                # Lê o caminho do arquivo
     files = ""
@@ -13,39 +14,47 @@ def listDirectory():
     return files
 
 ### Upload de arquivos para o servidor ###
-def putFile(con, fileName):                                             # Em produção...
-    expected_size = b""
-    while len(expected_size) < 8:
-        more_size = con.recv(8 - len(expected_size))
-        if not more_size:
-            raise Exception('msg invalida')
-        expected_size += more_size
-    expected_size = int.from_bytes(expected_size, 'big')
+'''
+def putFile(con):                                             # Em produção...
+    vetorBytes = []
+    bytes_rcvd = 0
+    MSGLEN = len(os.getcwd() + '/envio.darksouls')
+    while bytes_rcvd < MSGLEN:
+        bytes_uploaded = con.recv(min(MSGLEN - bytes_rcvd, 2048))
+        if bytes_uploaded == '':
+            raise RuntimeError("conexão interrompida")
+        vetorBytes.append(bytes_uploaded)
+        bytes_rcvd = bytes_rcvd + len(bytes_uploaded)
+    vetorBytes = str(vetorBytes)
+    with open('test.txt', 'w') as f:
+        f.write(vetorBytes)
+'''
+# Upload de arquivos para o servidor
+def recvFile(SOCKET):
 
-    packet = b""
-    while len(packet) < expected_size:
-        buffer = con.recv(expected_size - len(packet))
-        if not buffer:
-            raise Exception('arquivo imcompleto')
-        packet += buffer
-    with open(fileName, 'wb') as f:
-        f.write(packet)
-
-
+    with open('ArquivoJPG.jpg') as f:
+        pass
+    data = SOCKET.recv(1024)
+    while(data):
+        data = SOCKET.recv(1024)
+        f.write(data)
+    f.close()
+    SOCKET.close()
+    print('Recebido')
 ### Remoção de arquivos do servidor ###
 def removeFile():                                                       # Em produção...
     pass
 
 ### Download de arquivos ###
-def getFile(fileName):                                                  # Em produção...
-    f = open(os.getcwd() + '/{fileName}', 'rb')                        
-    return f
+def getFile(fileName):
+    print(fileName)                                                  # Em produção...
+    #f = open(os.getcwd() + f'/{fileName}', 'rb')                        
 
 
 def main():
-    HOST = socket.gethostbyname(socket.gethostname())                   # Endereco IP do Servidor
+    HOST = gethostbyname(gethostname())                   # Endereco IP do Servidor
     PORT = int(sys.argv[1])                                             # Porta que o servidor esta                 
-    SOCKET = socket.socket(socket.AF_INET, socket.SOCK_STREAM)          # Socket do servidor
+    SOCKET = socket(AF_INET, SOCK_STREAM)          # Socket do servidor
     ADDRESS = (HOST, PORT)                                              # Endereço do servidor/porta
     SOCKET.bind(ADDRESS)                                                # Designa o endereço e porta para o socket
     SOCKET.listen(10)                                                   # Escuta em até 10 conexões
@@ -53,15 +62,23 @@ def main():
         con, cliente = SOCKET.accept()                                  # Aceita a conexão do cliente
         print ('Conectado por', cliente)                                    
         while True:
-            MSG = str(con.recv(1024), 'utf-8')                          # Recebe a mensagem do cliente em bytes
+            MSG = con.recv(1024)                        # Recebe a mensagem do cliente em bytes
+            print MSG
             if not MSG: pass
-            elif MSG == 'list':                                         # Verifica se a mensagem é de listagem e decodifica
-                con.sendall(bytes(listDirectory(), 'utf-8'))            # Responde com a listagem do diretório
-            elif MSG == 'put':
-                pass                                # Recebe o arquivo do cliente e salva no servidor                                                   # Em andamento ...
+            elif MSG[:4] == 'list':                                         # Verifica se a mensagem é de listagem e decodifica
+                con.send(bytes(listDirectory()))
+                con.close()            # Responde com a listagem do diretório           
+            elif MSG[:3] == 'put':
+                print 'hue'
+                recvFile(con)
+
+            else:
+                break
+            con.close()
+            break                                                # Em andamento ...
         print ('Finalizando conexao do cliente', cliente)
         con.close()                                                     # Fecha a conexão
-
+    SOCKET.close()
 
 if __name__ == "__main__":
     main()
