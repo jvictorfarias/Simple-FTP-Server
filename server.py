@@ -27,16 +27,25 @@ def recvFile(SOCKET):
     SOCKET.close()
     print('Recebido')
 
+
 # Remoção de arquivos do servidor #
-def removeFile(SOCKET):
-    fileName = SOCKET.recv(1024)
-    os.remove('./' + str(fileName))
-    time.sleep(3)
-    SOCKET.close()                                   # Em produção...
+def removeFile(SOCKET):                                                     
+    fileName = SOCKET.recv(1024)                                        # Recebe o nome do arquivo 
+    os.remove('./' + str(fileName))                                     # Remove o arquivo na pasta local pelo nome
+    time.sleep(1)                                                       # Espera a execução do os.remove()
+    SOCKET.close()                                   
+
+
 # Download de arquivos #
-def getFile(fileName):
-    print(fileName)                                                     # Em produção...
-    #f = open(os.getcwd() + f'/{fileName}', 'rb')                        
+def sendFile(SOCKET):
+    fileName = SOCKET.recv(1024)
+    f = open('./' + str(fileName), 'r')                                 # Leitura do arquivo para envio
+    data = f.read(1024)
+    while(data):                                                        # Enquanto houver dados no buffer, ele continua enviando
+        SOCKET.send(data)
+        data = f.read(1024)
+    f.close()
+    SOCKET.close()                                                                          
 
 
 def main():
@@ -56,9 +65,10 @@ def main():
                 con.send(bytes(listDirectory()))                        # Responde com a listagem do diretório                   
             elif MSG == 'put':
                 recvFile(con)                                           # Aciona a função de recepção
-            elif MSG == 'rm':
+            elif MSG == 'get':
+                sendFile(con)
+            elif MSG == 'rm':                                           # Opção de remoção
                 removeFile(con)
-
             else:
                 break
             con.close()
