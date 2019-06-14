@@ -13,36 +13,23 @@ def listDirectory():
         files += file + '\t'
     return files
 
-### Upload de arquivos para o servidor ###
-'''
-def putFile(con):                                             # Em produção...
-    vetorBytes = []
-    bytes_rcvd = 0
-    MSGLEN = len(os.getcwd() + '/envio.darksouls')
-    while bytes_rcvd < MSGLEN:
-        bytes_uploaded = con.recv(min(MSGLEN - bytes_rcvd, 2048))
-        if bytes_uploaded == '':
-            raise RuntimeError("conexão interrompida")
-        vetorBytes.append(bytes_uploaded)
-        bytes_rcvd = bytes_rcvd + len(bytes_uploaded)
-    vetorBytes = str(vetorBytes)
-    with open('test.txt', 'w') as f:
-        f.write(vetorBytes)
-'''
+
 # Upload de arquivos para o servidor
 def recvFile(SOCKET):
-
-    with open('ArquivoJPG.jpg') as f:
-        pass
+    fileName = SOCKET.recv(1024)
+    f = open('./' + str(fileName), 'w')
     data = SOCKET.recv(1024)
     while(data):
-        data = SOCKET.recv(1024)
         f.write(data)
+        data = SOCKET.recv(1024)
     f.close()
     SOCKET.close()
     print('Recebido')
+
 ### Remoção de arquivos do servidor ###
-def removeFile():                                                       # Em produção...
+def removeFile(SOCKET):
+    fileName = SOCKET.recv(1024)
+    os.remove('./' + str(fileName))                                                   # Em produção...
     pass
 
 ### Download de arquivos ###
@@ -62,15 +49,16 @@ def main():
         con, cliente = SOCKET.accept()                                  # Aceita a conexão do cliente
         print ('Conectado por', cliente)                                    
         while True:
-            MSG = con.recv(1024)                        # Recebe a mensagem do cliente em bytes
-            print MSG
+            MSG = con.recv(1024) 
+                     # Recebe a mensagem do cliente em bytes
             if not MSG: pass
-            elif MSG[:4] == 'list':                                         # Verifica se a mensagem é de listagem e decodifica
+            elif MSG == 'list':                                         # Verifica se a mensagem é de listagem e decodifica
                 con.send(bytes(listDirectory()))
                 con.close()            # Responde com a listagem do diretório           
-            elif MSG[:3] == 'put':
-                print 'hue'
+            elif MSG == 'put':
                 recvFile(con)
+            elif MSG == 'remove':
+                pass
 
             else:
                 break

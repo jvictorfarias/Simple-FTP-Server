@@ -6,14 +6,18 @@ import os
 import sys
 import time
 
-HEADER = 20
 
 def uploadFile(SOCKET):
+   length = len(sys.argv[5])
+   sent = SOCKET.send(sys.argv[5])
+      # Envia a opção escolhida
+   while(sent < length):
+      sent += SOCKET.send(sys.argv[sent:])
    f = open('./' + sys.argv[4], 'r')
-   data = f.read(4096)
+   data = f.read(1024)
    while(data):
       SOCKET.send(data)
-      data = f.read(4096)
+      data = f.read(1024)
    f.close()
    SOCKET.close()
    print('Enviado')
@@ -35,29 +39,13 @@ def main():
    elif(MSG) == 'put':
       length = len(MSG)
       sent = SOCKET.send(MSG)
-      SOCKET.send(str(length))
+      # Envia a opção escolhida
       while(sent < length):
          sent += SOCKET.send(MSG[sent:])
-      while sent < 1024:
-         sent += SOCKET.send(' ')
-
+      
       time.sleep(1)
       uploadFile(SOCKET)
-   
-      '''
-      print(f'Enviando o arquivo: {sys.argv[4]}')
-      SOCKET.send(bytes(sys.argv[5], 'utf-8'))
-      with open(os.getcwd() + f'/{sys.argv[4]}', 'rb') as f:
-      with open(os.getcwd() + '/envio.darksouls', 'rb') as f:
-         file = f.read()
-      MSGLEN = len(file)
-      totalEnviado = 0
-      while totalEnviado < MSGLEN:
-         enviado = SOCKET.send(file[totalEnviado:])
-         if enviado == 0:
-               raise RuntimeError("sem conexão")
-         totalEnviado += enviado
-      '''
+
    elif(MSG) == 'get':
       pass
    elif(MSG) == 'rm':
