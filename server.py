@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import sys
 import os
+import time
 from socket import socket, AF_INET, SOCK_STREAM, gethostbyname, gethostname
 
 
@@ -29,9 +30,9 @@ def recvFile(SOCKET):
 # Remoção de arquivos do servidor #
 def removeFile(SOCKET):
     fileName = SOCKET.recv(1024)
-    os.remove('./' + str(fileName))                                     # Em produção...
-    pass
-
+    os.remove('./' + str(fileName))
+    time.sleep(3)
+    SOCKET.close()                                   # Em produção...
 # Download de arquivos #
 def getFile(fileName):
     print(fileName)                                                     # Em produção...
@@ -47,7 +48,7 @@ def main():
     SOCKET.listen(10)                                                   # Escuta em até 10 conexões
     while True:
         con, cliente = SOCKET.accept()                                  # Aceita a conexão do cliente
-        print ('Conectado por', cliente)                                    
+        print ('Servidor FTP executando.')                                    
         while True:
             MSG = con.recv(1024)                                        # Recebe a mensagem do cliente
             if not MSG: pass
@@ -55,8 +56,8 @@ def main():
                 con.send(bytes(listDirectory()))                        # Responde com a listagem do diretório                   
             elif MSG == 'put':
                 recvFile(con)                                           # Aciona a função de recepção
-            elif MSG == 'remove':
-                pass
+            elif MSG == 'rm':
+                removeFile(con)
 
             else:
                 break
