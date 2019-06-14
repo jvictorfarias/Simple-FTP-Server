@@ -4,8 +4,8 @@ import sys
 import os
 from socket import socket, AF_INET, SOCK_STREAM, gethostbyname, gethostname
 
-HEADER = 20
-# Listando arquivos no diretório atual ###
+
+# Listando arquivos no diretório atual #
 def listDirectory():
     localFiles = os.listdir(os.getcwd())                                # Lê o caminho do arquivo
     files = ""
@@ -14,34 +14,34 @@ def listDirectory():
     return files
 
 
-# Upload de arquivos para o servidor
+# Upload de arquivos para o servidor #
 def recvFile(SOCKET):
-    fileName = SOCKET.recv(1024)
-    f = open('./' + str(fileName), 'w')
+    fileName = SOCKET.recv(1024)                                        # Recebe o nome do arquivo
+    f = open('./' + str(fileName), 'w')                                 # Abre o arquivo que irá receber dados do cliente
     data = SOCKET.recv(1024)
-    while(data):
+    while(data):                                                        # Enquanto houver dados, salva no arquivo
         f.write(data)
         data = SOCKET.recv(1024)
     f.close()
     SOCKET.close()
     print('Recebido')
 
-### Remoção de arquivos do servidor ###
+# Remoção de arquivos do servidor #
 def removeFile(SOCKET):
     fileName = SOCKET.recv(1024)
-    os.remove('./' + str(fileName))                                                   # Em produção...
+    os.remove('./' + str(fileName))                                     # Em produção...
     pass
 
-### Download de arquivos ###
+# Download de arquivos #
 def getFile(fileName):
-    print(fileName)                                                  # Em produção...
+    print(fileName)                                                     # Em produção...
     #f = open(os.getcwd() + f'/{fileName}', 'rb')                        
 
 
 def main():
-    HOST = gethostbyname(gethostname())                   # Endereco IP do Servidor
+    HOST = gethostbyname(gethostname())                                 # Endereco IP do Servidor
     PORT = int(sys.argv[1])                                             # Porta que o servidor esta                 
-    SOCKET = socket(AF_INET, SOCK_STREAM)          # Socket do servidor
+    SOCKET = socket(AF_INET, SOCK_STREAM)                               # Socket do servidor
     ADDRESS = (HOST, PORT)                                              # Endereço do servidor/porta
     SOCKET.bind(ADDRESS)                                                # Designa o endereço e porta para o socket
     SOCKET.listen(10)                                                   # Escuta em até 10 conexões
@@ -49,14 +49,12 @@ def main():
         con, cliente = SOCKET.accept()                                  # Aceita a conexão do cliente
         print ('Conectado por', cliente)                                    
         while True:
-            MSG = con.recv(1024) 
-                     # Recebe a mensagem do cliente em bytes
+            MSG = con.recv(1024)                                        # Recebe a mensagem do cliente
             if not MSG: pass
-            elif MSG == 'list':                                         # Verifica se a mensagem é de listagem e decodifica
-                con.send(bytes(listDirectory()))
-                con.close()            # Responde com a listagem do diretório           
+            elif MSG == 'list':                                        
+                con.send(bytes(listDirectory()))                        # Responde com a listagem do diretório                   
             elif MSG == 'put':
-                recvFile(con)
+                recvFile(con)                                           # Aciona a função de recepção
             elif MSG == 'remove':
                 pass
 

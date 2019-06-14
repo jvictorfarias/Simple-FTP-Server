@@ -10,18 +10,17 @@ import time
 def listFiles(SOCKET):
    filesList = str(SOCKET.recv(1024))              # Recebe a cadeia de bytes e a transforma em string
    SOCKET.close()
-   print(filesList) 
+   print(filesList)                                # Mostra os arquivos que existem no diretório do servidor
 
 def uploadFile(SOCKET):
-   print('Enviando arquivo ' + sys.argv[4] + ' ...')
+   print('Enviando arquivo ' + sys.argv[4] + ' ...') 
    length = len(sys.argv[5])
-   sent = SOCKET.send(sys.argv[5])
-      # Envia a opção escolhida
-   while(sent < length):
+   sent = SOCKET.send(sys.argv[5])                 # Essa parte envia o nome do arquivo a ser salvo no servidor
+   while(sent < length):                     
       sent += SOCKET.send(sys.argv[sent:])
-   f = open('./' + sys.argv[4], 'r')
+   f = open('./' + sys.argv[4], 'r')               # Leitura do arquivo para envio
    data = f.read(1024)
-   while(data):
+   while(data):                                    # Enquanto houver dados no buffer, ele continua enviando
       SOCKET.send(data)
       data = f.read(1024)
    f.close()
@@ -42,12 +41,12 @@ def main():
 ###  Conexão com o servidor ###
    if(MSG) == 'list':                                          # Lista os diretórios do servidor
       listFiles(SOCKET)                                        
-   elif(MSG) == 'put':
+   elif(MSG) == 'put':                                         # Adiciona arquivos no servidor
       time.sleep(1)
       uploadFile(SOCKET)
-   elif(MSG) == 'get':
+   elif(MSG) == 'get':                                         # Download de arquivos do servidor
       pass
-   elif(MSG) == 'rm':
+   elif(MSG) == 'rm':                                          # Remoção de arquivos do servidor
       pass
 
 
