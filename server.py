@@ -4,6 +4,7 @@ import sys
 import os
 import time
 from socket import socket, AF_INET, SOCK_STREAM, gethostbyname, gethostname
+import threading
 
 
 # Listando arquivos no diretório atual #
@@ -47,6 +48,31 @@ def sendFile(SOCKET):
     f.close()
     SOCKET.close()                                                                          
 
+def aceitaConexao(SOCKET):
+    while True:
+        con, cliente = SOCKET.accept()                                  # Aceita a conexão do cliente
+        print ('Servidor FTP executando.')
+        thread_cn = threading.Thread(target = run, args = (con, cliente,))
+        thread_cn.start()
+
+def run(con, cliente):
+    while True:
+        MSG = con.recv(1024)                                        # Recebe a mensagem do cliente
+        if not MSG: pass
+        elif MSG == 'list':                                        
+            con.send(bytes(listDirectory()))                        # Responde com a listagem do diretório                   
+        elif MSG == 'put':
+            recvFile(con)                                           # Aciona a função de recepção
+        elif MSG == 'get':
+            sendFile(con)
+        elif MSG == 'rm':                                           # Opção de remoção
+            removeFile(con)
+        else:
+            break
+        con.close()
+        break                                                # Em andamento ...
+    print ('Finalizando conexao do cliente', cliente)
+    con.close()
 
 def main():
     HOST = gethostbyname(gethostname())                                 # Endereco IP do Servidor
@@ -55,29 +81,7 @@ def main():
     ADDRESS = (HOST, PORT)                                              # Endereço do servidor/porta
     SOCKET.bind(ADDRESS)                                                # Designa o endereço e porta para o socket
     SOCKET.listen(10)                                                   # Escuta em até 10 conexões
-    while True:
-        con, cliente = SOCKET.accept()                                  # Aceita a conexão do cliente
-        print ('Servidor FTP executando.')                                    
-        while True:
-            MSG = con.recv(1024)                                        # Recebe a mensagem do cliente
-            if not MSG: pass
-            elif MSG == 'list':                                        
-                con.send(bytes(listDirectory()))                        # Responde com a listagem do diretório                   
-            elif MSG == 'put':
-                recvFile(con)                                           # Aciona a função de recepção
-            elif MSG == 'get':
-                sendFile(con)
-            elif MSG == 'rm':                                           # Opção de remoção
-                removeFile(con)
-            else:
-                break
-            con.close()
-            break                                                # Em andamento ...
-        print ('Finalizando conexao do cliente', cliente)
-        con.close()                                                     # Fecha a conexão
-    SOCKET.close()
+    thread_ac = threading.Thread(target = aceitaConexao, args = (SOCKET,)).start()
 
 if __name__ == "__main__":
     main()
-
-
