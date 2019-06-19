@@ -50,9 +50,8 @@ def sendFile(SOCKET):
 
 def aceitaConexao(SOCKET):
     while True:
-        con, cliente = SOCKET.accept()                                  # Aceita a conexão do cliente
-        print ('Servidor FTP executando.')
-        thread_cn = threading.Thread(target = run, args = (con, cliente,))
+        con, cliente = SOCKET.accept()                                      # Aceita a conexão do cliente
+        thread_cn = threading.Thread(target = run, args = (con, cliente,))  # Método run colocado em uma thread
         thread_cn.start()
 
 def run(con, cliente):
@@ -64,24 +63,25 @@ def run(con, cliente):
         elif MSG == 'put':
             recvFile(con)                                           # Aciona a função de recepção
         elif MSG == 'get':
-            sendFile(con)
-        elif MSG == 'rm':                                           # Opção de remoção
-            removeFile(con)
+            sendFile(con)                                           # Aciona a função de envio
+        elif MSG == 'rm':
+            removeFile(con)                                         # Opção de remoção
         else:
             break
         con.close()
-        break                                                # Em andamento ...
+        break
     print ('Finalizando conexao do cliente', cliente)
     con.close()
 
 def main():
-    HOST = gethostbyname(gethostname())                                 # Endereco IP do Servidor
-    PORT = int(sys.argv[1])                                             # Porta que o servidor esta                 
-    SOCKET = socket(AF_INET, SOCK_STREAM)                               # Socket do servidor
-    ADDRESS = (HOST, PORT)                                              # Endereço do servidor/porta
-    SOCKET.bind(ADDRESS)                                                # Designa o endereço e porta para o socket
-    SOCKET.listen(10)                                                   # Escuta em até 10 conexões
-    thread_ac = threading.Thread(target = aceitaConexao, args = (SOCKET,)).start()
+    HOST = gethostbyname(gethostname())                                             # Endereco IP do Servidor
+    PORT = int(sys.argv[1])                                                         # Porta que o servidor esta                 
+    SOCKET = socket(AF_INET, SOCK_STREAM)                                           # Socket do servidor
+    ADDRESS = (HOST, PORT)                                                          # Endereço do servidor/porta
+    SOCKET.bind(ADDRESS)                                                            # Designa o endereço e porta para o socket
+    SOCKET.listen(10)                                                               # Escuta em até 10 conexões
+    print ("Servidor FTP executando.")
+    thread_ac = threading.Thread(target = aceitaConexao, args = (SOCKET,)).start()  # Coloca a conexão em uma thread
 
 if __name__ == "__main__":
     main()
