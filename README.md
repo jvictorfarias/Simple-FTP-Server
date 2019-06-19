@@ -8,6 +8,7 @@ Não foram utilizadas bibliotecas ou ferramentas externas, tudo que foi utilizad
 O programa implementa as funções de LISTAGEM ('list'), DOWNLOAD ('get'), UPLOAD ('put') e REMOÇÃO ('rm').
 
 Exemplos de execução:
+
     O servidor executa passando como parâmetro apenas a porta.
         usr@usr-pc:/arquiteturatcpip$ ./server.py [PORTA]
     
