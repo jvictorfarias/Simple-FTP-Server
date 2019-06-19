@@ -62,7 +62,7 @@ def main():
    MSG = str(sys.argv[3])                          # Mensagem que o cliente envia
    SOCKET = socket(AF_INET, SOCK_STREAM)           # Socket SOCKET do cliente
    SERVER = (HOST, PORT)                           # Endereço e porta do servidor
-   SOCKET.connect(SERVER)                          # Conexão estabelecida entre cliente/servidor                          
+   SOCKET.connect(SERVER)                          # Conexão estabelecida entre cliente/servidor.                          
    length = len(MSG)
    sent = SOCKET.send(MSG)
    while(sent < length):                           # Envia a opção escolhida
