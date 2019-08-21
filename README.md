@@ -1,11 +1,4 @@
-Trabalho final da disciplina de Internet e Arquitetura TCP-IP
-
-Nome da Equipe: Jamerson Aguiar     Nº 418866,
-                João Victor Farias  Nº 418082
-
-Foi utilizada a linguagem Python na versão 2.7.15 para a implementação do trabalho.
-Não foram utilizadas bibliotecas ou ferramentas externas, tudo que foi utilizado está presente na linguagem em questão.
-
+## Simple FTP Server
 O programa implementa as funções de LISTAGEM ('list'), DOWNLOAD ('get'), UPLOAD ('put') e REMOÇÃO ('rm').
 
 Exemplos de execução:
